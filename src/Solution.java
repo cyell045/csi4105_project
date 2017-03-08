@@ -4,13 +4,19 @@
 public class Solution {
 
     private long executionTime;
-    private int unsolvedBoard [][];
-    private int solvedBoard [][];
+    private int unsolvedBoard [][]; //puzzle
+    private int solvedBoard [][]; //solution to algorithm
+    private int solutionBoard [][]; //solution
 
-    public Solution(int [][] unsolved, int [][] solved, long time) {
+    public Solution(int [][] unsolved, int [][] solved, int [][] solution, long time) {
         unsolvedBoard = unsolved;
         solvedBoard = solved;
+        solutionBoard = solution;
         executionTime = time;
+    }
+
+    public Solution(int[][] solution) {
+        solutionBoard = solution;
     }
 
     public void printAlgoSolution() {
@@ -22,12 +28,13 @@ public class Solution {
         System.out.println("Solved Board");
         printBoard(solvedBoard);
 
-        System.out.println("Execution Time :");
-        System.out.println(executionTime);
+        System.out.println("Solution Board");
+        printBoard(solutionBoard);
 
+        System.out.println("Execution Time : " + executionTime + "s");
         System.out.println();
-        System.out.println("------------------------------------------------");
-    }
+
+}
 
     private void printBoard(int[][] board){
         System.out.println();
@@ -38,6 +45,20 @@ public class Solution {
             System.out.println();
         }
         System.out.println();
+    }
 
+    public int [][] getUnsolvedBoard()
+    {
+        return unsolvedBoard;
+    }
+
+    public int [][] getSolvedBoard()
+    {
+        return solvedBoard;
+    }
+
+    public int [][] getSolutionBoard()
+    {
+        return solutionBoard;
     }
 }

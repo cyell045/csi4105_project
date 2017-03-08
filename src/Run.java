@@ -2,6 +2,8 @@
  * Created by ChloeDiTomassoMasse on 2017-02-08.
  */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 import java.nio.file.Files;
@@ -10,13 +12,20 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Run {
     public static void main(String[] args) throws IOException {
-        System.out.println("Pick a size for your Sudoku puzzle (between 2 and 5:");
-        int i=0;
+
+        int n;
+        int puzzleNum;
         boolean wrongNumber;
+        String puzzlePath;
+        String solutionPath;
+        Scanner sc = new Scanner(System.in);
+
+
+        // Pick the size of the puzzle nxn
+        System.out.println("Pick a size for your Sudoku puzzle (between 2 and 5).");
         do {
-            Scanner sc = new Scanner(System.in);
-            i = sc.nextInt();
-            if (i > 1 && i < 6) {
+            n = sc.nextInt();
+            if (n >= 2 && n <= 5) {
                 wrongNumber = false;
             }
             else {
@@ -26,31 +35,145 @@ public class Run {
         }
         while(wrongNumber);
 
-        int n = i;
 
-        String path = "puzzles/"+n+"x"+n;
-        int max = (int)Files.list(Paths.get(path)).count();
-        int random = ThreadLocalRandom.current().nextInt(1, max + 1);
-        path = path + "/p" + random + ".txt";
-        System.out.println("SUDOKU PUZZLE CHOSEN: p"+random);
+        puzzlePath = "puzzles/" + n + "x" + n;
+        int max = (int)Files.list(Paths.get(puzzlePath)).count();
 
-        Sudoku sudoku = new Sudoku(n, path);
-        sudoku.printGame();
 
-        System.out.println("------------------------------------------------");
-        System.out.println();
+        // Pick which puzzle
+        System.out.println("Pick the sudoku puzzle you wish to verify (between 1 and " + max + ").");
+        do {
+            puzzleNum = sc.nextInt();
+            if (puzzleNum >= 1 && puzzleNum <= max) {
+                wrongNumber = false;
+            }
+            else {
+                System.out.println("Please pick a number between 1 and " + max + ".");
+                wrongNumber = true;
+            }
+        }
+        while(wrongNumber);
 
-        System.out.println("BACKTRACKING");
-        Solution s1 = new Backtracking(sudoku).solve();
-        s1.printAlgoSolution();
+        puzzlePath = "puzzles/" + n + "x" + n + "/p" + puzzleNum + ".txt";
+        solutionPath = "solutions/" + n + "x" + n + "/s" + puzzleNum + ".txt";
 
-        System.out.println("STOCHASTIC SEARCH");
-        Solution s2 = new StochasticSearch(sudoku).solve();
-        s2.printAlgoSolution();
 
-        System.out.println("DANCING LINKS");
-        Solution s3 = new DancingLinks(sudoku).solve();
-        s3.printAlgoSolution();
+
+        System.out.println("Select a number:");
+        System.out.println("1 - verify that the board is correctly formed");
+        System.out.println("2 - verify Backtracking Algorithm");
+        System.out.println("3 - verify Stochastic Search Algorithm");
+        System.out.println("4 - verify Dancing Links Algorithm");
+        System.out.println("5 - verify all Algorithms");
+
+        int i = sc.nextInt();
+
+        // Verify that a specific board is correctly formed
+        if (i == 1)
+        {
+
+            if (Verification.verifyPuzzle(readBoard(puzzlePath, n*n), readBoard(solutionPath, n*n)))
+            {
+                System.out.println("The puzzle p" + puzzleNum + " is correctly formed.");
+            }
+            else
+            {
+                System.out.println("The puzzle is incorrectly formed.  Please verify that puzzle p" + puzzleNum + " and s" + puzzleNum + " are the correct.");
+            }
+        }
+
+        // Verify Algorithms work
+
+        else if (i >= 2){
+
+            Sudoku sudoku = new Sudoku(n, puzzlePath);
+            Solution sol = new Solution (readBoard(solutionPath, n*n));
+
+
+            System.out.println("------------------------------------------------");
+            System.out.println();
+
+            if (i == 2 || i == 5){
+                System.out.println("BACKTRACKING");
+
+                Solution s1 = new Backtracking(sudoku, sol).solve();
+                s1.printAlgoSolution();
+                if (Verification.verifySolution(s1))
+                {
+                    System.out.println("The puzzle p" + puzzleNum + " was correctly solved.");
+                }
+                else
+                {
+                    System.out.println("The puzzle p" + puzzleNum + " was not correctly solved.  Please verify your algorithm.");
+                }
+
+                System.out.println();
+                System.out.println("------------------------------------------------");
+                System.out.println();
+
+            }
+
+            if (i == 3 || i == 5) {
+                System.out.println("STOCHASTIC SEARCH");
+
+                Solution s2 = new StochasticSearch(sudoku, sol).solve();
+                s2.printAlgoSolution();
+                if (Verification.verifySolution(s2)) {
+                    System.out.println("The puzzle p" + puzzleNum + " was correctly solved.");
+                } else {
+                    System.out.println("The puzzle p" + puzzleNum + " was not correctly solved.  Please verify your algorithm.");
+                }
+                System.out.println();
+                System.out.println("------------------------------------------------");
+                System.out.println();            }
+
+            if (i == 4 || i == 5) {
+                System.out.println("DANCING LINKS");
+
+                Solution s3 = new DancingLinks(sudoku, sol).solve();
+                s3.printAlgoSolution();
+                Verification.verifySolution(s3);
+                if (Verification.verifySolution(s3)) {
+                    System.out.println("The puzzle p" + puzzleNum + " was correctly solved.");
+                } else {
+                    System.out.println("The puzzle p" + puzzleNum + " was not correctly solved.  Please verify your algorithm.");
+                }
+                System.out.println();
+                System.out.println("------------------------------------------------");
+                System.out.println();            }
+
+        }
+    }
+
+
+    public static int [][] readBoard(String filename, int nsquared)
+    {
+        int [][] board = new int[nsquared][nsquared];
+
+        try
+        {
+            FileReader fr = new FileReader(filename);
+            BufferedReader stdin = new BufferedReader(fr);
+
+            String [] lineArray;
+            String line = "";
+
+            for(int i = 0; i < nsquared; i++)
+            {
+                line = stdin.readLine();
+                lineArray = line.split(",");
+                for(int j = 0; j < nsquared; j++){
+                    board[i][j] = Integer.parseInt(lineArray[j]);
+                }
+
+            }
+        }
+        catch(java.io.IOException e)
+        {
+            System.out.println(e);
+        }
+
+        return board;
     }
 
 }
