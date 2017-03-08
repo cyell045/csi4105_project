@@ -41,15 +41,15 @@ public class Run {
         System.out.println();
 
         System.out.println("BACKTRACKING");
-        Solution s1 = new Backtracking(n, sudoku).solve();
+        Solution s1 = new Backtracking(sudoku).solve();
         s1.printAlgoSolution();
 
         System.out.println("STOCHASTIC SEARCH");
-        Solution s2 = new StochasticSearch(n, sudoku).solve();
+        Solution s2 = new StochasticSearch(sudoku).solve();
         s2.printAlgoSolution();
 
         System.out.println("DANCING LINKS");
-        Solution s3 = new DancingLinks(n, sudoku).solve();
+        Solution s3 = new DancingLinks(sudoku).solve();
         s3.printAlgoSolution();
     }
 

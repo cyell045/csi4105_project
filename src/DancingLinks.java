@@ -5,12 +5,16 @@ import java.util.Date;
  */
 public class DancingLinks {
     private int n;
+    private int nsquared;
+    private int numberOfCells;
     private int [][] board;
     private int [][] solution;
 
-    public DancingLinks (int n, Sudoku sudoku) {
-        this.n = n;
-        board = sudoku.getCopyOfBoard();
+    public DancingLinks (Sudoku sudoku) {
+        this.n = sudoku.getN();
+        this.nsquared = sudoku.getNSquared();
+        this.numberOfCells = sudoku.getTotalNumberOfCells();
+        this.board = sudoku.getCopyOfBoard();
     }
 
 
