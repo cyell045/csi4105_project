@@ -11,12 +11,12 @@ public class Sudoku
     static Set fullSet;
     static int [][] board;
     static int n;
-    static int N;
+    static int nsquared;
 
     public Sudoku (int n, String path)
     {
         n = n;
-        N = n*n;
+        nsquared = n*n;
         initializeBoard();
 
         File file = new File(path);
@@ -29,11 +29,11 @@ public class Sudoku
      **/
     public static void initializeBoard()
     {
-        board = new int[N][N];
+        board = new int[nsquared][nsquared];
 
-        Set empty = new Set(N);
-        Set fullSet = new Set(N);
-        for(int i = 1; i <= N; i++)
+        Set empty = new Set(nsquared);
+        Set fullSet = new Set(nsquared);
+        for(int i = 1; i <= nsquared; i++)
             fullSet.insert(i);
     }
 
@@ -51,11 +51,11 @@ public class Sudoku
             String line = "";
             String [] array;
 
-            for(int i = 0; i < N; i++)
+            for(int i = 0; i < nsquared; i++)
             {
                 line = stdin.readLine();
                 array = line.split(",");
-                for(int j = 0; j < N; j++){
+                for(int j = 0; j < nsquared; j++){
                     board[i][j] = Integer.parseInt(array[j]);
                 }
 
@@ -68,16 +68,15 @@ public class Sudoku
     }
 
 
-
     /**
      * Output the current board.
      **/
     public static void printGame()
     {
         System.out.println();
-        for(int i = 0; i < N; i++)
+        for(int i = 0; i < nsquared; i++)
         {
-            for(int j = 0; j < N; j++)
+            for(int j = 0; j < nsquared; j++)
                 System.out.print(board[i][j] + " ");
             System.out.println();
         }
@@ -88,16 +87,28 @@ public class Sudoku
      * Returns a copy of the sudoku board
      **/
     public int[][] getCopyOfBoard(){
-        int [][] newBoard = new int [N][N];
+        int [][] newBoard = new int [nsquared][nsquared];
 
-        for(int i = 0; i < N; i++)
+        for(int i = 0; i < nsquared; i++)
         {
-            for(int j = 0; j < N; j++){
+            for(int j = 0; j < nsquared; j++){
                 newBoard[i][j] = board[i][j];
             }
         }
 
         return newBoard;
+    }
+
+    public int getN(){
+        return n;
+    }
+
+    public int getNSquared(){
+        return nsquared;
+    }
+
+    public int getTotalNumberOfCells(){
+        return nsquared*nsquared;
     }
 }
 

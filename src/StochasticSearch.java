@@ -6,14 +6,17 @@ import java.util.Date;
 
 public class StochasticSearch {
     private int n;
+    private int nsquared;
+    private int numberOfCells;
     private int [][] board;
     private int [][] solution;
 
-    public StochasticSearch (int n, Sudoku sudoku) {
-        this.n = n;
-        board = sudoku.getCopyOfBoard();
+    public StochasticSearch (Sudoku sudoku) {
+        this.n = sudoku.getN();
+        this.nsquared = sudoku.getNSquared();
+        this.numberOfCells = sudoku.getTotalNumberOfCells();
+        this.board = sudoku.getCopyOfBoard();
     }
-
 
     public Solution solve () {
         long lStartTime = new Date().getTime();
@@ -34,6 +37,4 @@ public class StochasticSearch {
         long time = lEndTime - lStartTime;
         return new Solution(board, solution, time);
     }
-
-
 }
