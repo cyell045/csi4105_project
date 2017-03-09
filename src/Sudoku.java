@@ -12,21 +12,25 @@ public class Sudoku
 
     static int [][] initial;
     static int [][] current;
+    static int [][] solution;
 
     static int n;
     static int N;
 
     static int numberOfCell;
 
-    public Sudoku (int n, String path) {
+    public Sudoku (int n, String path_init, String path_sol) {
         this.n = n;
         this.N = n*n;
         this.numberOfCell = N*N;
 
         initializeBoard();
 
-        File file = new File(path);
-        readGame(file.getAbsolutePath());
+        File file_init = new File(path_init);
+        readGame(file_init.getAbsolutePath());
+
+        File file_sol = new File(path_sol);
+        readSolution(file_sol.getAbsolutePath());
     }
 
     /**
@@ -36,6 +40,7 @@ public class Sudoku
     public void initializeBoard() {
         this.initial = new int[N][N];
         this.current = new int[N][N];
+        this.solution = new int[N][N];
         Set empty = new Set(N);
         Set fullSet = new Set(N);
 
@@ -74,17 +79,78 @@ public class Sudoku
     }
 
     /**
-     * Output the current board settings on the console.
+     * Read the game from a file.
+     * @param filename
      */
-    public static void printBoard() {
-        System.out.println();
-        for(int i = 0; i<N; i++){
-            System.out.print(" ");
-            for(int j = 0; j<N; j++){
-                System.out.print(current[i][j] +" ");
+    public static void readSolution(String filename) {
+        try
+        {
+            FileReader fr = new FileReader(filename);
+            BufferedReader stdin = new BufferedReader(fr);
+
+            String line = "";
+            String [] array;
+
+            for(int i = 0; i < N; i++)
+            {
+                line = stdin.readLine();
+                array = line.split(",");
+                for(int j = 0; j < N; j++){
+                    solution[i][j] = Integer.parseInt(array[j]);
+                }
+
             }
-            System.out.println();
         }
+        catch(java.io.IOException e)
+        {
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * Output the current board settings on the console.
+     * @param      id == 0: print initial board
+     *             id == 1: print current board
+     *             id == 2: print solution board
+     */
+
+    public static void printBoard(int id){
+        int [][] newBoard = new int[N][N];
+
+        newBoard = getCopyOfBoard(id);
+
+        //Create topBottom string
+        int dash = 5*N+n-1;
+        StringBuilder topBottom = new StringBuilder();
+        topBottom.append(" ");
+        for(int i=0; i<dash; i++){
+            topBottom.append("-");
+        }
+        topBottom.append(" ");
+
+        //Create numbers row
+        for(int i = 0; i<N; i++){
+            if(i%n==0){
+                System.out.println(topBottom);
+            }
+
+            for(int j=0; j<N; j++){
+                if(j%n==0){
+                    System.out.print("|");
+                }
+                if(newBoard[i][j]>9){
+                    System.out.print(" "+newBoard[i][j]+"  ");
+                }else{
+                    System.out.print("  "+newBoard[i][j]+"  ");
+                }
+            }
+            System.out.print("|");
+            System.out.println();
+            if(i==N){
+                System.out.println(topBottom);
+            }
+        }
+        System.out.println(topBottom);
     }
 
     /**
@@ -99,9 +165,33 @@ public class Sudoku
     }
 
     /**
+     * Returns a copy of the initial sudoku board
+     **/
+    public static int[][] getCopyOfBoard(int id){
+        if(id==0){
+            return getCopyOfInitial();
+        }else if(id==1){
+            return getCopyOfCurrent();
+        }else{
+            return getCopyOfSolution();
+        }
+    }
+
+    private static int[][] getCopyOfInitial(){
+        int[][] newBoard = new int[N][N];
+
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++){
+                newBoard[i][j]=initial[i][j];
+            }
+        }
+        return newBoard;
+    }
+
+    /**
      * Returns a copy of the current sudoku board
      **/
-    public static int[][] getCopyOfCurrent(){
+    private static int[][] getCopyOfCurrent(){
         int[][] newBoard = new int[N][N];
 
         for(int i=0; i<N; i++){
@@ -115,12 +205,12 @@ public class Sudoku
     /**
      * Returns a copy of the initial sudoku board
      **/
-    public static int[][] getCopyOfInitial(){
+    private static int[][] getCopyOfSolution(){
         int[][] newBoard = new int[N][N];
 
         for(int i=0; i<N; i++){
             for(int j=0; j<N; j++){
-                newBoard[i][j]=initial[i][j];
+                newBoard[i][j]=solution[i][j];
             }
         }
         return newBoard;

@@ -59,8 +59,6 @@ public class Run {
             puzzlePath = "puzzles/" + n + "x" + n + "/p" + puzzleNum + ".txt";
             solutionPath = "solutions/" + n + "x" + n + "/s" + puzzleNum + ".txt";
 
-
-
             System.out.println("Select a number:");
             System.out.println("1 - verify that the board is correctly formed");
             System.out.println("2 - verify Backtracking Algorithm");
@@ -88,9 +86,7 @@ public class Run {
 
             else if (i >= 2){
 
-                Sudoku sudoku = new Sudoku(n, puzzlePath);
-                Solution sol = new Solution (readBoard(solutionPath, n*n));
-
+                Sudoku sudoku = new Sudoku(n, puzzlePath, solutionPath);
 
                 System.out.println("------------------------------------------------");
                 System.out.println();
@@ -98,8 +94,8 @@ public class Run {
                 if (i == 2 || i == 5){
                     System.out.println("BACKTRACKING");
 
-                    Solution s1 = new Backtracking(sudoku, sol).solve();
-                    s1.printAlgoSolution();
+                    Solution s1 = new Backtracking(sudoku).solve();
+                    s1.printAllBoards();
                     if (Verification.verifySolution(s1))
                     {
                         System.out.println("The puzzle p" + puzzleNum + " was correctly solved.");
@@ -118,8 +114,8 @@ public class Run {
                 if (i == 3 || i == 5) {
                     System.out.println("STOCHASTIC SEARCH");
 
-                    Solution s2 = new StochasticSearch(sudoku, sol).solve();
-                    s2.printAlgoSolution();
+                    Solution s2 = new StochasticSearch(sudoku).solve();
+                    s2.printAllBoards();
                     if (Verification.verifySolution(s2)) {
                         System.out.println("The puzzle p" + puzzleNum + " was correctly solved.");
                     } else {
@@ -132,8 +128,8 @@ public class Run {
                 if (i == 4 || i == 5) {
                     System.out.println("DANCING LINKS");
 
-                    Solution s3 = new DancingLinks(sudoku, sol).solve();
-                    s3.printAlgoSolution();
+                    Solution s3 = new DancingLinks(sudoku).solve();
+                    s3.printAllBoards();
                     Verification.verifySolution(s3);
                     if (Verification.verifySolution(s3)) {
                         System.out.println("The puzzle p" + puzzleNum + " was correctly solved.");
