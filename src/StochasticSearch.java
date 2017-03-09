@@ -7,17 +7,19 @@ import java.util.Date;
 public class StochasticSearch {
 
     private int n;
-    private int nsquared;
-    private int numberOfCells;
+    private int N;
+    private int numberOfCell;
+    private Sudoku problem;
     private int [][] board;
     private int [][] algoSolution;
     private int [][] solution;
 
+
     public StochasticSearch (Sudoku sudoku, Solution sol) {
+        this.problem = sudoku;
         this.n = sudoku.getN();
-        this.nsquared = sudoku.getNSquared();
-        this.numberOfCells = sudoku.getTotalNumberOfCells();
-        this.board = sudoku.getCopyOfBoard();
+        this.N = sudoku.getNSquared();
+        this.numberOfCell = sudoku.getNumberOfCell();
         this.solution = sol.getSolutionBoard();
     }
 

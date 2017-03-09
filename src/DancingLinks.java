@@ -6,26 +6,24 @@ import java.util.Date;
 public class DancingLinks {
 
     private int n;
-    private int nsquared;
-    private int numberOfCells;
+    private int N;
+    private int numberOfCell;
+    private Sudoku problem;
     private int [][] board;
     private int [][] algoSolution;
     private int [][] solution;
 
     public DancingLinks (Sudoku sudoku, Solution sol) {
+        this.problem = sudoku;
         this.n = sudoku.getN();
-        this.nsquared = sudoku.getNSquared();
-        this.numberOfCells = sudoku.getTotalNumberOfCells();
-        this.board = sudoku.getCopyOfBoard();
+        this.N = sudoku.getNSquared();
+        this.numberOfCell = sudoku.getNumberOfCell();
         this.solution = sol.getSolutionBoard();
     }
 
 
     public Solution solve () {
         long lStartTime = new Date().getTime();
-
-
-
 
 
         //algorithm magic!

@@ -5,18 +5,19 @@ import java.util.Date;
  */
 public class Backtracking {
 
+    private Sudoku problem;
     private int n;
-    private int nsquared;
-    private int numberOfCells;
-    private int [][] board;
-    private int [][] algoSolution;
+    private int N;
+    private int numberOfCell;
+
     private int [][] solution;
 
+
     public Backtracking (Sudoku sudoku, Solution sol) {
+        this.problem = sudoku;
         this.n = sudoku.getN();
-        this.nsquared = sudoku.getNSquared();
-        this.numberOfCells = sudoku.getTotalNumberOfCells();
-        this.board = sudoku.getCopyOfBoard();
+        this.N = sudoku.getNSquared();
+        this.numberOfCell = sudoku.getNumberOfCell();
         this.solution = sol.getSolutionBoard();
     }
 
@@ -24,62 +25,60 @@ public class Backtracking {
     public Solution solve () {
         long lStartTime = new Date().getTime();
 
-        int row_index = 0;
-        int col_index = 0;
+        int row;
+        int col;
+
         int index = 0;
+
         boolean backtracking_needed = false;
 
-        while(index>=0 && index<nsquared*nsquared) {
-            row_index = index/nsquared;
-            col_index = index%nsquared;
+        while (index >= 0 && index < numberOfCell) {
+            row = index / N;
+            col = index % N;
 
-            System.out.println();
-            System.out.println("index:"+index+"   ["+row_index+"]["+col_index+"]");
+            //problem.printBoard();
+            //System.out.println();
 
-            if(isUnassigned(index)){
-                board[row_index][col_index]+=1;
+            //Only work with unassigned cell
+            if (!problem.isSolved(index)) {
+                //System.out.println();
+                //System.out.println("INDEX: " + index);
 
-                if(board[row_index][col_index]>=nsquared){
-                    //NO VALID VALUE EXISTS!
+                problem.setNumber(index, problem.getNumber(index) + 1);
+                //System.out.println("BOARD[" + row + "][" + col + "]: "+problem.getNumber(index));
+
+                //Find next valid value to try, if one exists
+                while (!problem.isAllowed(index, problem.getNumber(index)) && problem.getNumber(index) <= N) {
+                    problem.setNumber(index, problem.getNumber(index) + 1);
                 }
-                //We need to reset cell and backtrack
-                System.out.println("["+row_index+"]["+col_index+"]: 0 => BACKTRACKING NEEDED");
-                board[row_index][col_index]=0;
-                backtracking_needed = true;
-            }else{
-                System.out.println("["+row_index+"]["+col_index+"]: "+board[row_index][col_index]);
-                backtracking_needed = false;
 
-                isCorrect(index, board[row_index][col_index]);
+                if(problem.getNumber(index) > N) {
+                    //System.out.println(">> Number: " + problem.getNumber(index)+";");
+                    //System.out.println("   Backtracking needed: TRUE.");
+
+                    problem.setNumber(index, 0);
+                    backtracking_needed = true;
+
+                }else {
+                    //System.out.println(">> Number: " + problem.getNumber(index) +";");
+                    //System.out.println("   Backtracking needed: FALSE.");
+
+                    backtracking_needed = false;
+                }
             }
-
 
             if(backtracking_needed){
-                //If backtracking is needed we move backward by 1.
-                index -= 1;
-
+                index -=1;
+                //System.out.println("   index - 1 = " + index);
             }else{
-                //If no backtracking is needed we move forward by 1.
-                index += 1;
+                index +=1;
+                //System.out.println("   index + 1 = " + index);
             }
+            System.out.println("");
         }
-
-
-        //for now set the solution equal to board (remove this)
-        algoSolution = board;
 
         long lEndTime = new Date().getTime();
         long time = lEndTime - lStartTime;
-        return new Solution(board, algoSolution, solution, time);
-    }
-
-
-
-    private boolean isUnassigned(int index){
-        return board[index/nsquared][index%nsquared]==0;
-    }
-
-    private boolean isCorrect(int index, int assigned_number){
-        return false;
+        return new Solution(problem.getCopyOfInitial(), problem.getCopyOfCurrent(), solution, time);
     }
 }
