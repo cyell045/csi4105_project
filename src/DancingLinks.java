@@ -5,19 +5,18 @@ import java.util.Date;
  */
 public class DancingLinks {
 
+    private Sudoku problem;
     private int n;
-    private int nsquared;
-    private int numberOfCells;
-    private int [][] board;
-    private int [][] algoSolution;
-    private int [][] solution;
+    private int N;
+    private int numberOfCell;
 
-    public DancingLinks (Sudoku sudoku, Solution sol) {
+
+    public DancingLinks (Sudoku sudoku) {
+        this.problem = sudoku;
         this.n = sudoku.getN();
-        this.nsquared = sudoku.getNSquared();
-        this.numberOfCells = sudoku.getTotalNumberOfCells();
-        this.board = sudoku.getCopyOfBoard();
-        this.solution = sol.getSolutionBoard();
+        this.N = sudoku.getNSquared();
+        this.numberOfCell = sudoku.getNumberOfCell();
+        problem.printBoard(0);
     }
 
 
@@ -25,19 +24,11 @@ public class DancingLinks {
         long lStartTime = new Date().getTime();
 
 
-
-
-
         //algorithm magic!
 
 
-
-
-        //for now set the solution equal to board (remove this)
-        algoSolution = board;
-
         long lEndTime = new Date().getTime();
         long time = lEndTime - lStartTime;
-        return new Solution(board, algoSolution, solution, time);
+        return new Solution(problem, time);
     }
 }
