@@ -1,12 +1,15 @@
+import java.math.BigDecimal;
+
 /**
  * Created by celineyelle on 2017-03-04.
  */
+
 public class Solution {
 
-    private long executionTime;
+    private BigDecimal executionTime;
     private Sudoku solution;
 
-    public Solution(Sudoku sudoku, long time){
+    public Solution(Sudoku sudoku, BigDecimal time){
         this.solution = sudoku;
         executionTime = time;
     }
@@ -28,7 +31,7 @@ public class Solution {
         solution.printBoard(2);
 
         System.out.println();
-        System.out.println("Execution Time : " + executionTime + "s");
+        System.out.println("Execution Time : " + executionTime + "ms");
         System.out.println();
     }
 
