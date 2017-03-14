@@ -1,7 +1,7 @@
 /**
  * Created by celineyelle on 2017-03-04.
  */
-import java.util.Date;
+import java.math.BigDecimal;
 
 
 public class StochasticSearch {
@@ -21,7 +21,7 @@ public class StochasticSearch {
 
 
     public Solution solve () {
-        long lStartTime = new Date().getTime();
+        long lStartTime = System.nanoTime();
 
 
 
@@ -29,8 +29,8 @@ public class StochasticSearch {
         //algorithm magic!
 
 
-        long lEndTime = new Date().getTime();
-        long time = lEndTime - lStartTime;
+        long lEndTime = System.nanoTime();
+        BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
         return new Solution(problem, time);
     }
 }

@@ -6,10 +6,6 @@ import java.io.*;
 
 public class Sudoku
 {
-
-    static Set empty;
-    static Set fullSet;
-
     static int [][] initial;
     static int [][] current;
     static int [][] solution;
@@ -41,11 +37,6 @@ public class Sudoku
         this.initial = new int[N][N];
         this.current = new int[N][N];
         this.solution = new int[N][N];
-        Set empty = new Set(N);
-        Set fullSet = new Set(N);
-
-        for(int i = 1; i <= N; i++)
-            fullSet.insert(i);
     }
 
     /**
