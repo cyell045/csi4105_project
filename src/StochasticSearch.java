@@ -2,8 +2,7 @@
  * Created by celineyelle on 2017-03-04.
  */
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 
 public class StochasticSearch {
@@ -25,49 +24,64 @@ public class StochasticSearch {
 
 
         long lStartTime = new Date().getTime();
-        Sudoku tempBoard = problem;
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                int[] numArray = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
-                int[] sBox = new int[]{0, 0};
-
-                for (int k = n; k <= N; k += n) {
-                    if (i < k && sBox[0] == 0) {
-                        sBox[0] = k - n;
-                    }
-                    if (j < k && sBox[1] == 0) {
-                        sBox[1] = k - n;
-                    }
-                    if (sBox[0] != 0 && sBox[1] != 0) {
-                        break;
-                    }
-                }
-
-                for (int k = 0; k < n; k++) {
-                    if (problem.isUsedInRow(j, i, numArray[k]) ||
-                            problem.isUsedInCol(i, j, numArray[k]) ||
-                            problem.isUsedInBox(i, sBox[0], j, sBox[1], numArray[k])) {
-                        numArray[k] = 0;
-                        break;
-                    }
-                }
-                int random = 0;
-                while (random == 0) {
-                    Random rand = new Random();
-                    int k = rand.nextInt(11);
-                    if (numArray[k] != 0) {
-                        random = numArray[k];
-                    }
-                }
-
-            }
-        }
+        Sudoku tempBoard = getOptimizedBoard(problem);
 
 
         long lEndTime = new Date().getTime();
         BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
         return new Solution(problem, time);
+    }
+
+    /** This method takes the initial board and solves the 'obvious' cells to obtain a better partially filled board. **/
+    public Sudoku getOptimizedBoard(Sudoku sudoku){
+
+        List<Integer> numList = new ArrayList<>() ;
+        for(int i = 0; i<N; i++){
+            numList.add(i+1);
+        }
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                //See if the cell is empty
+                if(sudoku.getNumber(i,j) == 0) {
+                    List<Integer> tempNumList = numList;
+                    int[] sBox = new int[]{0, 0};
+
+                    //Find box the cell is in
+                    for (int k = n; k <= N; k += n) {
+                        if (i < k && sBox[0] == 0) {
+                            sBox[0] = k - n;
+                        }
+                        if (j < k && sBox[1] == 0) {
+                            sBox[1] = k - n;
+                        }
+                        if (sBox[0] != 0 && sBox[1] != 0) {
+                            break;
+                        }
+                    }
+
+                    //Find possible values
+                    for (int k = 0; k < N; k++) {
+                        if (sudoku.isUsedInRow(j, i, tempNumList.get(k)) ||
+                                sudoku.isUsedInCol(i, j, tempNumList.get(k)) ||
+                                sudoku.isUsedInBox(i, sBox[0], j, sBox[1], tempNumList.get(k))) {
+                            tempNumList.remove(k);
+                        }
+                    }
+
+                    //If only one value is possible, assign this value to the cell and restart the outer
+                    // loop.
+                    if (tempNumList.size() == 1) {
+                        sudoku.setNumber(i, j, tempNumList.get(0));
+                        i = 0;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return sudoku;
     }
 
     public boolean isSolution(Sudoku sudoku) {
