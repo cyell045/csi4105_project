@@ -3,6 +3,7 @@
  */
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.ArrayList;
 
 
 public class StochasticSearch {
@@ -25,7 +26,7 @@ public class StochasticSearch {
 
         long lStartTime = new Date().getTime();
 
-        Sudoku tempBoard = getOptimizedBoard(problem);
+        problem = getOptimizedBoard(problem);
 
 
         long lEndTime = new Date().getTime();
@@ -36,46 +37,50 @@ public class StochasticSearch {
     /** This method takes the initial board and solves the 'obvious' cells to obtain a better partially filled board. **/
     public Sudoku getOptimizedBoard(Sudoku sudoku){
 
-        List<Integer> numList = new ArrayList<>() ;
+        ArrayList<Integer> numList = new ArrayList<Integer>() ;
         for(int i = 0; i<N; i++){
             numList.add(i+1);
         }
 
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
+                //System.out.print("Row: " + i + "\t");
+                //System.out.println("Col: " + j);
+
                 //See if the cell is empty
                 if(sudoku.getNumber(i,j) == 0) {
-                    List<Integer> tempNumList = numList;
-                    int[] sBox = new int[]{0, 0};
+                    ArrayList<Integer> tempNumList = new ArrayList<Integer>();
+                    Integer[] tempNumArray = numList.toArray(new Integer[tempNumList.size()]);
+                    int[] sBox = new int[]{-1, -1};
 
                     //Find box the cell is in
                     for (int k = n; k <= N; k += n) {
-                        if (i < k && sBox[0] == 0) {
+                        if (i < k && sBox[0] == -1) {
                             sBox[0] = k - n;
                         }
-                        if (j < k && sBox[1] == 0) {
+                        if (j < k && sBox[1] == -1) {
                             sBox[1] = k - n;
                         }
-                        if (sBox[0] != 0 && sBox[1] != 0) {
+                        if (sBox[0] != -1 && sBox[1] != -1) {
                             break;
                         }
                     }
+                    //System.out.println("Box: [" + sBox[0] + "][" + sBox[1]+"]");
 
                     //Find possible values
-                    for (int k = 0; k < N; k++) {
-                        if (sudoku.isUsedInRow(j, i, tempNumList.get(k)) ||
-                                sudoku.isUsedInCol(i, j, tempNumList.get(k)) ||
-                                sudoku.isUsedInBox(i, sBox[0], j, sBox[1], tempNumList.get(k))) {
-                            tempNumList.remove(k);
+                    for(int k =0; k< N; k++){
+                        if (sudoku.isAllowed(i,j, tempNumArray[k])) {
+                            tempNumList.add(tempNumArray[k]);
                         }
                     }
 
                     //If only one value is possible, assign this value to the cell and restart the outer
                     // loop.
                     if (tempNumList.size() == 1) {
+                        System.out.println("Added number in cell: " + tempNumList.get(0));
                         sudoku.setNumber(i, j, tempNumList.get(0));
                         i = 0;
-                        break;
+                        j = 0;
                     }
                 }
             }
