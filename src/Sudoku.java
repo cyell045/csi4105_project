@@ -323,5 +323,16 @@ public class Sudoku
         //System.out.println("   >isUsedInBox: FALSE");
         return false;
     }
+
+    public boolean isBoardSolved(){
+        for(int i = 0; i<N; i++){
+            for (int j = 0; j<N; j++) {
+                if(current[i][j]==0){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 

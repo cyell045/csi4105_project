@@ -12,6 +12,7 @@ public class StochasticSearch {
     private int N;
     private int numberOfCell;
     private Sudoku problem;
+    private int t_0;
 
 
     public StochasticSearch(Sudoku sudoku) {
@@ -19,6 +20,7 @@ public class StochasticSearch {
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
         this.numberOfCell = sudoku.getNumberOfCell();
+        this.t_0 = 100;
     }
 
     public Solution solve() {
@@ -28,6 +30,14 @@ public class StochasticSearch {
 
         problem = getOptimizedBoard(problem);
 
+        if(problem.isBoardSolved()){
+            System.out.println("Miraculously solved the board. No need to go to the Simulated Annealing algorithm.");
+            long lEndTime = new Date().getTime();
+            BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
+            return new Solution(problem, time);
+        }
+
+        System.out.print("Not solved yet. Going to Simulated Annealing algorithm.");
 
         long lEndTime = new Date().getTime();
         BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
@@ -77,7 +87,7 @@ public class StochasticSearch {
                     //If only one value is possible, assign this value to the cell and restart the outer
                     // loop.
                     if (tempNumList.size() == 1) {
-                        System.out.println("Added number in cell: " + tempNumList.get(0));
+                        //System.out.println("Added number in cell: " + tempNumList.get(0));
                         sudoku.setNumber(i, j, tempNumList.get(0));
                         i = 0;
                         j = 0;
