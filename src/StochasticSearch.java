@@ -1,6 +1,7 @@
 /**
  * Created by celineyelle on 2017-03-04.
  */
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.ArrayList;
@@ -43,13 +44,16 @@ public class StochasticSearch {
             return new Solution(problem, time);
         }
 
+        System.out.println("Not solved yet. Going to Simulated Annealing algorithm.");
+
         problem = fillIn(problem);
+        problem.printBoard(1);
 
         current_cost = costFunction(problem);
         best_cost = current_cost;
         T = t_0;
 
-        while(T>0){
+        while(T>1){
             Random rand_col = new Random();
             int col = rand_col.nextInt(N);
 
@@ -59,14 +63,18 @@ public class StochasticSearch {
             Random rand_row2 = new Random();
             int row2 = rand_row2.nextInt(N);
 
-            if(flipNumbers(row1, row2, col)){
+            boolean solved = flipNumbers(problem,row1, row2, col);
+            System.out.println("Solved?: " + solved);
+            if(solved){
                 break;
             }
-
             T = alpha * T;
-        }
 
-        System.out.print("Not solved yet. Going to Simulated Annealing algorithm.");
+            if(!solved && T<=1){
+                System.out.println("Resetting temperature");
+                T= t_0;
+            }
+        }
 
         long lEndTime = new Date().getTime();
         BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
@@ -74,45 +82,50 @@ public class StochasticSearch {
     }
 
     public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
-        int cur_cost_row1 = 0; int cur_cost_row2 = 0; int cur_cost_box1 = 0; int cur_cost_box2 = 0;
-        int new_cost_row1 = 0; int new_cost_row2 = 0; int new_cost_box1 = 0; int new_cost_box2 = 0;
+        int cost_to_delete = 0;
+        int cost_to_add = 0;
         for(int i = 1; i<=N; i++)
         {
-            if(sudoku.isUsedInRow(row1,i )){cur_cost_row1 +=1;}
-            if(sudoku.isUsedInRow(row2,i )){cur_cost_row2 +=1;}
-            if(sudoku.isUsedInBox(row1,i)){cur_cost_box1 +=1;}
-            if(sudoku.isUsedInBox(row2,i)){cur_cost_box2 +=1;}
+            if(!sudoku.isUsedInRow(row1,i )){cost_to_delete +=1;}
+            if(!sudoku.isUsedInRow(row2,i )){cost_to_delete +=1;}
+            if(!sudoku.isUsedInBox(row1,i)){cost_to_delete +=1;}
+            if(!sudoku.isUsedInBox(row2,i)){cost_to_delete +=1;}
         }
 
         int num1 = sudoku.getNumber(row1, col);
         int num2 = sudoku.getNumber(row2, col);
 
-        int tempCost = current_cost - (cur_cost_box1 + cur_cost_box2 + cur_cost_row1 + cur_cost_row2);
+        int tempCost = current_cost - cost_to_delete;
 
         sudoku.setNumber(row1, col, num2);
         sudoku.setNumber(row2, col, num1);
 
         for(int j = 1; j<=N; j++)
         {
-            if(sudoku.isUsedInRow(row1,j )){new_cost_row1 +=1;}
-            if(sudoku.isUsedInRow(row2,j )){new_cost_row2 +=1;}
-            if(sudoku.isUsedInBox(row1,j)){new_cost_box1 +=1;}
-            if(sudoku.isUsedInBox(row2,j)){new_cost_box2 +=1;}
+            if(!sudoku.isUsedInRow(row1,j )){cost_to_add +=1;}
+            if(!sudoku.isUsedInRow(row2,j )){cost_to_add +=1;}
+            if(!sudoku.isUsedInBox(row1,j)){cost_to_add +=1;}
+            if(!sudoku.isUsedInBox(row2,j)){cost_to_add +=1;}
         }
 
-        int newCost = tempCost + new_cost_box1 + new_cost_box2 + new_cost_row1 + new_cost_row2;
+        int newCost = tempCost + cost_to_add;
         double delta = -(newCost - current_cost);
         double rand  = Math.random();
+
+        System.out.println("Old Cost: " + current_cost);
+        System.out.println("New Cost: " + newCost);
 
         if(Math.exp(delta/T) - rand >0){
             problem = sudoku;
             current_cost = newCost;
+            System.out.println("Updated current sudoku problem");
         }
-        if(newCost < best_cost){
+        if(current_cost < best_cost){
+            System.out.println("Updated best solution problem");
             best_solution = sudoku;
             best_cost = newCost;
-            current_cost = newCost;
-            problem = sudoku;
+            //current_cost = newCost;
+            //problem = sudoku;
         }
         if(newCost == 0){
             best_solution = problem;
@@ -178,22 +191,24 @@ public class StochasticSearch {
 
     public Sudoku fillIn(Sudoku sudoku){
 
-        LinkedList<Integer> numList = new LinkedList<Integer>() ;
-        for(int i = 0; i<N; i++){
-            numList.add(i+1);
-        }
-
-        LinkedList<LinkedList<Integer>> possibleNumsList = new LinkedList<LinkedList<Integer>>() ;
         for(int i=0; i<N; i++){ //col
-            possibleNumsList.add(i, numList);
+
+            ArrayList<Integer> possNumList = new ArrayList<Integer>();
+            for(int j = 0; j<N; j++){
+                possNumList.add(j+1);
+            }
+
             for(int j=0; j<N; j++){ //row
                 if(sudoku.getNumber(j,i)!=0){ //updates the possible numbers to add into the sudoku
-                    possibleNumsList.get(i).remove(sudoku.getNumber(j,i));
+                    possNumList.remove((Object) sudoku.getNumber(j,i));
                 }
             }
             for(int k=0; k<N; k++){
-                if(sudoku.getNumber(k,i)==0){ //set numbers from possible nums list
-                    sudoku.setNumber(k,i, possibleNumsList.get(i).removeFirst());
+                if(possNumList.size() == 0){
+                    k = N;
+                }else if(sudoku.getNumber(k,i)==0){ //set numbers from possible nums list
+                    sudoku.setNumber(k,i, possNumList.get(k%possNumList.size()));
+                    possNumList.remove(k%possNumList.size());
                 }
             }
         }
