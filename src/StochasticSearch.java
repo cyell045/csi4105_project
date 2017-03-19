@@ -101,7 +101,6 @@ public class StochasticSearch {
                 }
             }
         }
-
         return sudoku;
     }
 
@@ -124,10 +123,25 @@ public class StochasticSearch {
                 if(sudoku.getNumber(k,i)==0){ //set numbers from possible nums list
                     sudoku.setNumber(k,i, possibleNumsList.get(i).removeFirst());
                 }
-
             }
         }
         return sudoku;
     }
 
+    public Integer costFunction (Sudoku sudoku){
+        int cost=0;
+        for(int j=0; j<N; j++){
+            for(int k=1; k<=N; k++){
+                if(!sudoku.isUsedInRow(j, k)) {
+                    cost += 1;
+                }
+            }
+            for(int k=1; k<=N; k++){
+                if(!sudoku.isUsedInBox(j, k)) {
+                    cost += 1;
+                }
+            }
+        }
+        return cost;
+    }
 }

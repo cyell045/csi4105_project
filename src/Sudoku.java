@@ -288,6 +288,24 @@ public class Sudoku
         return isAllowed;
     }
 
+    public boolean isUsedInRow(int row, int number){
+        for(int i=0; i<N; i++){
+            if(isUsedInRow(row,i,number)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isUsedInBox(int row, int number){
+        for(int i=0; i<N; i++){
+            if(isUsedInBox(row,row-(row%n),i,i-(i%n),number)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isUsedInRow(int row, int col, int number){
         for(int x=0; x<N; x++){
             if(current[row][x]==number && x!=col){
@@ -298,6 +316,7 @@ public class Sudoku
         //System.out.println("   >isUsedInRow: FALSE");
         return false;
     }
+
 
     public boolean isUsedInCol(int row, int col, int number) {
         for (int x = 0; x < N; x++) {
