@@ -68,7 +68,7 @@ public class StochasticSearch {
         return new Solution(problem, time);
     }
 
-    public boolean flipNumbers (Sudoku sudoku, Integer row1, Integer row2, Integer col){
+    public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
         int cur_cost_row1 = 0; int cur_cost_row2 = 0; int cur_cost_box1 = 0; int cur_cost_box2 = 0;
         int new_cost_row1 = 0; int new_cost_row2 = 0; int new_cost_box1 = 0; int new_cost_box2 = 0;
         for(int i = 1; i<=N; i++)
@@ -101,16 +101,16 @@ public class StochasticSearch {
 
         if(Math.exp(delta/T) - rand >0){
             current_cost = newCost;
-        }
-
-        if(newCost < best_cost){
+        }else if(newCost < best_cost){
             best_solution = problem;
             best_cost = newCost;
-        }
-
-        if(newCost == 0){
+            current_cost = newCost;
+        } else if(newCost == 0){
             best_solution = problem;
             return true;
+        } else{
+            problem.setNumber(row1,col, num1);
+            problem.setNumber(row2, col, num2);
         }
 
         return false;
