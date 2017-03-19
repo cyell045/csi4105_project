@@ -12,7 +12,8 @@ public class StochasticSearch {
     private int N;
     private int numberOfCell;
     private Sudoku problem;
-    private int t_0;
+    private double t_0;
+    private double alpha;
 
 
     public StochasticSearch(Sudoku sudoku) {
@@ -20,7 +21,8 @@ public class StochasticSearch {
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
         this.numberOfCell = sudoku.getNumberOfCell();
-        this.t_0 = 100;
+        this.t_0 = 100.0;
+        this.alpha = 0.99;
     }
 
     public Solution solve() {
@@ -36,6 +38,9 @@ public class StochasticSearch {
             BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
             return new Solution(problem, time);
         }
+
+
+
 
         System.out.print("Not solved yet. Going to Simulated Annealing algorithm.");
 
@@ -99,8 +104,5 @@ public class StochasticSearch {
         return sudoku;
     }
 
-    public boolean isSolution(Sudoku sudoku) {
-        return true;
 
-    }
 }
