@@ -99,8 +99,28 @@ public class StochasticSearch {
         return sudoku;
     }
 
-    public boolean isSolution(Sudoku sudoku) {
-        return true;
+    public Sudoku fillIn (Sudoku sudoku){
 
+        LinkedList<Integer> numList = new LinkedList<Integer>() ;
+        for(int i = 0; i<N; i++){
+            numList.add(i+1);
+        }
+
+        LinkedList<LinkedList<Integer>> possibleNumsList = new LinkedList<LinkedList<Integer>>() ;
+        for(int i=0; i<N; i++){ //col
+            possibleNumsList.add(i, numList);
+            for(int j=0; j<N; j++){ //row
+                if(sudoku.getNumber(j,i)!=0){ //updates the possible numbers to add into the sudoku
+                    possibleNumsList.get(i).remove(sudoku.getNumber(j,i));
+                }
+            }
+            for(int k=0; k<N; k++){
+                if(sudoku.getNumber(k,i)==0){ //set numbers from possible nums list
+                    sudoku.setNumber(k,i, possibleNumsList.get(i).removeFirst());
+                }
+
+            }
+        }
+        return sudoku;
     }
 }
