@@ -27,7 +27,7 @@ public class StochasticSearch {
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
         this.numberOfCell = sudoku.getNumberOfCell();
-        this.t_0 = 100.0;
+        this.t_0 = 25;
         this.alpha = 0.99;
         this.fixed = new int[N][N];
     }
@@ -65,19 +65,25 @@ public class StochasticSearch {
             Random rand_row2 = new Random();
             int row2 = rand_row2.nextInt(N);
 
-            if(fixed[row1][col] == 0 || fixed[row2][col]==0){
+            if(fixed[row1][col] != 0 || fixed[row2][col]!=0){
                 continue;
             }
 
             boolean solved = flipNumbers(problem,row1, row2, col);
-            System.out.println("Solved?: " + solved);
-            if(solved){
+            /*if(solved && T>1.5){
+               continue;
+            }*/
+            if(current_cost < 5){
                 break;
+            }
+
+            if(solved){
+                best_solution.printBoard(1);
             }
             T = alpha * T;
 
             if(!solved && T<=1){
-                System.out.println("Resetting temperature");
+                //System.out.println("Resetting temperature");
                 T= t_0;
             }
         }
@@ -88,46 +94,29 @@ public class StochasticSearch {
     }
 
     public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
-        int cost_to_delete = 0;
-        int cost_to_add = 0;
-        for(int i = 1; i<=N; i++)
-        {
-            if(!sudoku.isUsedInRow(row1,i )){cost_to_delete +=1;}
-            if(!sudoku.isUsedInRow(row2,i )){cost_to_delete +=1;}
-            if(!sudoku.isUsedInBox(row1,i)){cost_to_delete +=1;}
-            if(!sudoku.isUsedInBox(row2,i)){cost_to_delete +=1;}
-        }
+        System.out.println(current_cost);
 
         int num1 = sudoku.getNumber(row1, col);
         int num2 = sudoku.getNumber(row2, col);
 
-        int tempCost = current_cost - cost_to_delete;
-
         sudoku.setNumber(row1, col, num2);
         sudoku.setNumber(row2, col, num1);
 
-        for(int j = 1; j<=N; j++)
-        {
-            if(!sudoku.isUsedInRow(row1,j )){cost_to_add +=1;}
-            if(!sudoku.isUsedInRow(row2,j )){cost_to_add +=1;}
-            if(!sudoku.isUsedInBox(row1,j)){cost_to_add +=1;}
-            if(!sudoku.isUsedInBox(row2,j)){cost_to_add +=1;}
-        }
-
-        int newCost = tempCost + cost_to_add;
+        int newCost = costFunction(sudoku);
+        System.out.println(newCost);
         double delta = -(newCost - current_cost);
         double rand  = Math.random();
 
-        System.out.println("Old Cost: " + current_cost);
-        System.out.println("New Cost: " + newCost);
+        //System.out.println("Old Cost: " + current_cost);
+        //System.out.println("New Cost: " + newCost);
 
         if(Math.exp(delta/T) - rand >0){
             problem = sudoku;
             current_cost = newCost;
-            System.out.println("Updated current sudoku problem");
+            //System.out.println("Updated current sudoku problem");
         }
-        if(current_cost < best_cost){
-            System.out.println("Updated best solution problem");
+        if(newCost < best_cost){
+            //System.out.println("Updated best solution problem");
             best_solution = sudoku;
             best_cost = newCost;
             //current_cost = newCost;
@@ -156,25 +145,8 @@ public class StochasticSearch {
 
                 //See if the cell is empty
                 if(sudoku.getNumber(i,j) == 0) {
-                    fixed[i][j] = 0;
-
                     ArrayList<Integer> tempNumList = new ArrayList<Integer>();
                     Integer[] tempNumArray = numList.toArray(new Integer[tempNumList.size()]);
-                    int[] sBox = new int[]{-1, -1};
-
-                    //Find box the cell is in
-                    for (int k = n; k <= N; k += n) {
-                        if (i < k && sBox[0] == -1) {
-                            sBox[0] = k - n;
-                        }
-                        if (j < k && sBox[1] == -1) {
-                            sBox[1] = k - n;
-                        }
-                        if (sBox[0] != -1 && sBox[1] != -1) {
-                            break;
-                        }
-                    }
-                    //System.out.println("Box: [" + sBox[0] + "][" + sBox[1]+"]");
 
                     //Find possible values
                     for(int k =0; k< N; k++){
@@ -198,6 +170,7 @@ public class StochasticSearch {
                 }
             }
         }
+        System.out.println();
         return sudoku;
     }
 
