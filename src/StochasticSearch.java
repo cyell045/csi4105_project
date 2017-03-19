@@ -59,13 +59,18 @@ public class StochasticSearch {
             Random rand_row2 = new Random();
             int row2 = rand_row2.nextInt(N);
 
+            if(flipNumbers(row1, row2, col)){
+                break;
+            }
+
+            T = alpha * T;
         }
 
         System.out.print("Not solved yet. Going to Simulated Annealing algorithm.");
 
         long lEndTime = new Date().getTime();
         BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
-        return new Solution(problem, time);
+        return new Solution(best_solution, time);
     }
 
     public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
@@ -100,22 +105,20 @@ public class StochasticSearch {
         double rand  = Math.random();
 
         if(Math.exp(delta/T) - rand >0){
+            problem = sudoku;
             current_cost = newCost;
-        }else if(newCost < best_cost){
-            best_solution = problem;
+        }
+        if(newCost < best_cost){
+            best_solution = sudoku;
             best_cost = newCost;
             current_cost = newCost;
-        } else if(newCost == 0){
+            problem = sudoku;
+        }
+        if(newCost == 0){
             best_solution = problem;
             return true;
-        } else{
-            problem.setNumber(row1,col, num1);
-            problem.setNumber(row2, col, num2);
         }
-
         return false;
-
-
     }
 
 
