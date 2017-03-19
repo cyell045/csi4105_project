@@ -20,6 +20,7 @@ public class StochasticSearch {
     private int best_cost;
     private int current_cost;
     private double T;
+    private int[][] fixed;
 
     public StochasticSearch(Sudoku sudoku) {
         this.problem = sudoku;
@@ -28,6 +29,7 @@ public class StochasticSearch {
         this.numberOfCell = sudoku.getNumberOfCell();
         this.t_0 = 100.0;
         this.alpha = 0.99;
+        this.fixed = new int[N][N];
     }
 
     public Solution solve() {
@@ -62,6 +64,10 @@ public class StochasticSearch {
 
             Random rand_row2 = new Random();
             int row2 = rand_row2.nextInt(N);
+
+            if(fixed[row1][col] == 0 || fixed[row2][col]==0){
+                continue;
+            }
 
             boolean solved = flipNumbers(problem,row1, row2, col);
             System.out.println("Solved?: " + solved);
@@ -150,6 +156,8 @@ public class StochasticSearch {
 
                 //See if the cell is empty
                 if(sudoku.getNumber(i,j) == 0) {
+                    fixed[i][j] = 0;
+
                     ArrayList<Integer> tempNumList = new ArrayList<Integer>();
                     Integer[] tempNumArray = numList.toArray(new Integer[tempNumList.size()]);
                     int[] sBox = new int[]{-1, -1};
@@ -180,9 +188,13 @@ public class StochasticSearch {
                     if (tempNumList.size() == 1) {
                         //System.out.println("Added number in cell: " + tempNumList.get(0));
                         sudoku.setNumber(i, j, tempNumList.get(0));
+                        fixed[i][j] = tempNumList.get(0);
                         i = 0;
                         j = 0;
                     }
+                }
+                else{
+                    fixed[i][j] = sudoku.getNumber(i,j);
                 }
             }
         }
@@ -190,7 +202,6 @@ public class StochasticSearch {
     }
 
     public Sudoku fillIn(Sudoku sudoku){
-
         for(int i=0; i<N; i++){ //col
 
             ArrayList<Integer> possNumList = new ArrayList<Integer>();
