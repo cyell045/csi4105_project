@@ -39,6 +39,7 @@ public class StochasticSearch {
             return new Solution(problem, time);
         }
 
+        problem = fillIn(problem);
 
 
 
@@ -104,8 +105,7 @@ public class StochasticSearch {
         return sudoku;
     }
 
-<<<<<<< HEAD
-    public Sudoku fillIn (Sudoku sudoku){
+    public Sudoku fillIn(Sudoku sudoku){
 
         LinkedList<Integer> numList = new LinkedList<Integer>() ;
         for(int i = 0; i<N; i++){
@@ -129,7 +129,5 @@ public class StochasticSearch {
         }
         return sudoku;
     }
-=======
 
->>>>>>> 9f5a2ddf343d8ebe2336090894abd8894108e755
 }
