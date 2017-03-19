@@ -4,6 +4,7 @@
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class StochasticSearch {
@@ -12,9 +13,12 @@ public class StochasticSearch {
     private int N;
     private int numberOfCell;
     private Sudoku problem;
+    private Sudoku best_solution;
     private double t_0;
     private double alpha;
-
+    private int best_cost;
+    private int current_cost;
+    private double T;
 
     public StochasticSearch(Sudoku sudoku) {
         this.problem = sudoku;
@@ -41,7 +45,21 @@ public class StochasticSearch {
 
         problem = fillIn(problem);
 
+        current_cost = costFunction(problem);
+        best_cost = current_cost;
+        T = t_0;
 
+        while(T>0){
+            Random rand_col = new Random();
+            int col = rand_col.nextInt(N);
+
+            Random rand_row1 = new Random();
+            int row1= rand_row1.nextInt(N);
+
+            Random rand_row2 = new Random();
+            int row2 = rand_row2.nextInt(N);
+
+        }
 
         System.out.print("Not solved yet. Going to Simulated Annealing algorithm.");
 
@@ -49,6 +67,57 @@ public class StochasticSearch {
         BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
         return new Solution(problem, time);
     }
+
+    public boolean flipNumbers (Sudoku sudoku, Integer row1, Integer row2, Integer col){
+        int cur_cost_row1 = 0; int cur_cost_row2 = 0; int cur_cost_box1 = 0; int cur_cost_box2 = 0;
+        int new_cost_row1 = 0; int new_cost_row2 = 0; int new_cost_box1 = 0; int new_cost_box2 = 0;
+        for(int i = 1; i<=N; i++)
+        {
+            if(sudoku.isUsedInRow(row1,i )){cur_cost_row1 +=1;}
+            if(sudoku.isUsedInRow(row2,i )){cur_cost_row2 +=1;}
+            if(sudoku.isUsedInBox(row1,i)){cur_cost_box1 +=1;}
+            if(sudoku.isUsedInBox(row2,i)){cur_cost_box2 +=1;}
+        }
+
+        int num1 = sudoku.getNumber(row1, col);
+        int num2 = sudoku.getNumber(row2, col);
+
+        int tempCost = current_cost - (cur_cost_box1 + cur_cost_box2 + cur_cost_row1 + cur_cost_row2);
+
+        sudoku.setNumber(row1, col, num2);
+        sudoku.setNumber(row2, col, num1);
+
+        for(int j = 1; j<=N; j++)
+        {
+            if(sudoku.isUsedInRow(row1,j )){new_cost_row1 +=1;}
+            if(sudoku.isUsedInRow(row2,j )){new_cost_row2 +=1;}
+            if(sudoku.isUsedInBox(row1,j)){new_cost_box1 +=1;}
+            if(sudoku.isUsedInBox(row2,j)){new_cost_box2 +=1;}
+        }
+
+        int newCost = tempCost + new_cost_box1 + new_cost_box2 + new_cost_row1 + new_cost_row2;
+        double delta = -(newCost - current_cost);
+        double rand  = Math.random();
+
+        if(Math.exp(delta/T) - rand >0){
+            current_cost = newCost;
+        }
+
+        if(newCost < best_cost){
+            best_solution = problem;
+            best_cost = newCost;
+        }
+
+        if(newCost == 0){
+            best_solution = problem;
+            return true;
+        }
+
+        return false;
+
+
+    }
+
 
     /** This method takes the initial board and solves the 'obvious' cells to obtain a better partially filled board. **/
     public Sudoku getOptimizedBoard(Sudoku sudoku){
