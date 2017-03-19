@@ -1,5 +1,7 @@
 /**
- * Created by celineyelle on 2017-03-04.
+ * By Camille La Rose & Sara El
+ * Based on the algorithm provided by Rhydian Lewis at
+ * https://www.researchgate.net/publication/221411168_On_the_Combination_of_Constraint_Programming_and_Stochastic_Search_The_Sudoku_Case
  */
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -27,7 +29,7 @@ public class StochasticSearch {
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
         this.numberOfCell = sudoku.getNumberOfCell();
-        this.t_0 = 25;
+        this.t_0 = 1000;
         this.alpha = 0.99;
         this.fixed = new int[N][N];
     }
@@ -73,12 +75,11 @@ public class StochasticSearch {
             /*if(solved && T>1.5){
                continue;
             }*/
-            if(current_cost < 5){
+            /*if(best_cost<5){
                 break;
-            }
-
+            }*/
             if(solved){
-                best_solution.printBoard(1);
+                break;
             }
             T = alpha * T;
 
@@ -110,17 +111,17 @@ public class StochasticSearch {
         //System.out.println("Old Cost: " + current_cost);
         //System.out.println("New Cost: " + newCost);
 
-        if(Math.exp(delta/T) - rand >0){
-            problem = sudoku;
-            current_cost = newCost;
-            //System.out.println("Updated current sudoku problem");
-        }
         if(newCost < best_cost){
             //System.out.println("Updated best solution problem");
             best_solution = sudoku;
             best_cost = newCost;
-            //current_cost = newCost;
-            //problem = sudoku;
+            current_cost = newCost;
+            problem = sudoku;
+        }
+        if(Math.exp(delta/T) - rand >0){
+            problem = sudoku;
+            current_cost = newCost;
+            //System.out.println("Updated current sudoku problem");
         }
         if(newCost == 0){
             best_solution = problem;
