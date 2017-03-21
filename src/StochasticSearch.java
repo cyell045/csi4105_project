@@ -29,7 +29,7 @@ public class StochasticSearch {
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
         this.numberOfCell = sudoku.getNumberOfCell();
-        this.t_0 = 1000;
+        this.t_0 = 50;
         this.alpha = 0.99;
         this.fixed = new int[N][N];
     }
@@ -95,7 +95,7 @@ public class StochasticSearch {
     }
 
     public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
-        System.out.println(current_cost);
+
 
         int num1 = sudoku.getNumber(row1, col);
         int num2 = sudoku.getNumber(row2, col);
@@ -104,7 +104,6 @@ public class StochasticSearch {
         sudoku.setNumber(row2, col, num1);
 
         int newCost = costFunction(sudoku);
-        System.out.println(newCost);
         double delta = -(newCost - current_cost);
         double rand  = Math.random();
 
@@ -115,8 +114,7 @@ public class StochasticSearch {
             //System.out.println("Updated best solution problem");
             best_solution = sudoku;
             best_cost = newCost;
-            current_cost = newCost;
-            problem = sudoku;
+            System.out.println(best_cost);
         }
         if(Math.exp(delta/T) - rand >0){
             problem = sudoku;
