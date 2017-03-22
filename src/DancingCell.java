@@ -1,8 +1,9 @@
-/**
+/*
  * Created by celineyelle on 2017-03-09.
  *
- * Based off of the solution provided by Anish Ratnawat
- * which was based off of Algorithm X by Donald Knuth
+ * Based off of Algorithm X by Donald Knuth
+ * Based off of the Algorithm X adaptation to Sudoku by Anish Ratnawat
+ * Based off of the Algorithm X adaptation to Sudoku by Jonathan Chu
  */
 
 
@@ -13,14 +14,14 @@ class DancingCell
     int count;
     SudokuCell cell = null;
 
-    DancingCell(DancingCell tail, DancingCell header, int i, int j) {
+    DancingCell(DancingCell leftmost, DancingCell header, int i, int j) {
 
-        if(tail == null) {
-            L=this;
-            R=this;
+        if(leftmost == null) {
+            L = this;
+            R = this;
         } else {
-            L   = tail.L;
-            R   = tail;
+            L = leftmost.L;
+            R = leftmost;
             L.R = this;
             R.L = this;
         }
@@ -31,7 +32,7 @@ class DancingCell
             D = this;
         }  else {
             U = header.U;
-            D   = header;
+            D = header;
             U.D = this;
             D.U = this;
         }

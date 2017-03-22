@@ -1,11 +1,13 @@
-import java.math.BigDecimal;
-
-/**
+/*
  * Created by celineyelle on 2017-03-09.
  *
- * Based off of the solution provided by Anish Ratnawat
- * which was based off of Algorithm X by Donald Knuth
+ * Based off of Algorithm X by Donald Knuth
+ * Based off of the Algorithm X adaptation to Sudoku by Anish Ratnawat
+ * Based off of the Algorithm X adaptation to Sudoku by Jonathan Chu
  */
+
+import java.math.BigDecimal;
+
 
 public class DancingLinks {
 
@@ -14,6 +16,8 @@ public class DancingLinks {
     private int N;
     private SudokuCell [][] puzzle;
 
+
+
     public DancingLinks (Sudoku sudoku) {
         this.sudoku = sudoku;
         this.n = sudoku.getN();
@@ -21,23 +25,25 @@ public class DancingLinks {
     }
 
 
+
     public Solution solve () {
         long lStartTime = System.nanoTime();
 
         //algorithm magic!
+
         ExactCover ec = new ExactCover(n);
         puzzle = new SudokuCell[N][N];
-        initializeSudoku();
+        initializeSudokuCellPuzzle();
         findPossibleElements();
+        ec.transformSudokuToExactCover(puzzle);
 
-        ec.transformToExactCover(puzzle);
-
-        if(ec.findSolution()) {
+        if(ec.search()) {
             for (SudokuCell c : ec.possibleSolution) {
                 puzzle[c.row][c.col].cellValue = c.cellValue;
             }
         }
 
+        // returns the Sudoku Cell puzzle matrix to our Sudoku matrix
         returnSolutionToSudokuBoard();
 
         long lEndTime = System.nanoTime();
@@ -46,7 +52,8 @@ public class DancingLinks {
     }
 
 
-    public void initializeSudoku() {
+
+    public void initializeSudokuCellPuzzle() {
 
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
@@ -61,6 +68,8 @@ public class DancingLinks {
         }
     }
 
+
+
     public void returnSolutionToSudokuBoard() {
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
@@ -68,6 +77,8 @@ public class DancingLinks {
             }
         }
     }
+
+
 
     public void findPossibleElements(){
 
