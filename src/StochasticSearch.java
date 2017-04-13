@@ -23,6 +23,7 @@ public class StochasticSearch {
     private int current_cost;
     private double T;
     private int[][] fixed;
+    private ArrayList<Integer>[][] cellsLists;
     long lStartTime;
 
     public StochasticSearch(Sudoku sudoku) {
@@ -145,35 +146,108 @@ public class StochasticSearch {
 
 
     /** This method takes the initial board and solves the 'obvious' cells to obtain a better partially filled board. **/
-    public Sudoku getOptimizedBoard(Sudoku sudoku){
+    public Sudoku getOptimizedBoard(Sudoku sudoku) {
+        cellsLists = new ArrayList[N][N];
 
         ArrayList<Integer> numList = new ArrayList<Integer>() ;
         for(int i = 0; i<N; i++){
             numList.add(i+1);
         }
+
+        updateCellsLists(sudoku, numList);
+        sudoku = partiallyFill(sudoku, numList);
+        updateCellsLists(sudoku, numList);
+
+        for(int i = 0; i<N; i++){
+            for (int j = 0; j < N; j++) {
+                if(sudoku.getNumber(i,j) == 0){
+                    for(int number: cellsLists[i][j]){
+                        if( !isThere("col", number, i, j, sudoku) ||
+                            !isThere("row", number, i, j, sudoku) ||
+                            !isThere("box", number, i, j, sudoku)){
+                            sudoku.setNumber(i, j, number);
+                            updateCellsLists(sudoku, numList);
+                            sudoku = partiallyFill(sudoku, numList);
+                            updateCellsLists(sudoku, numList);
+                            fixed[i][j] = number;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return sudoku;
+    }
+
+    public void updateCellsLists(Sudoku sudoku, ArrayList<Integer> numList) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                //System.out.print("Row: " + i + "\t");
-                //System.out.println("Col: " + j);
-
-                //See if the cell is empty
-                if(sudoku.getNumber(i,j) == 0) {
+                cellsLists[i][j] = new ArrayList<Integer>();
+                if (sudoku.getNumber(i, j) == 0) {
                     ArrayList<Integer> tempNumList = new ArrayList<Integer>();
                     Integer[] tempNumArray = numList.toArray(new Integer[tempNumList.size()]);
 
                     //Find possible values
-                    for(int k =0; k< N; k++){
-                        if (sudoku.isAllowed(i,j, tempNumArray[k])) {
+                    for (int k = 0; k < N; k++) {
+                        if (sudoku.isAllowed(i, j, tempNumArray[k])) {
                             tempNumList.add(tempNumArray[k]);
                         }
                     }
+                    cellsLists[i][j] = tempNumList;
+                }
+            }
+        }
+    }
 
+    public boolean isThere(String type, int number, int row, int col, Sudoku sudoku){
+        boolean isThere = false;
+        switch(type){
+            case "box":
+                int startRow = row - (row%n);
+                int startCol = col - (col%n);
+                for(int i = startRow; i<n+startRow && !isThere; i++){
+                    for(int j = startCol; j< n + startCol; j++){
+                        if(cellsLists[i][j].contains(number)
+                                &&(j!=col || i!=row)){
+                            isThere = true;
+                            break;
+                        }
+                    }
+                }
+                break;
+            case "col":
+                for(int i = 0; i<N; i++) {
+                    if (cellsLists[i][col].contains(number) && i != row) {
+                        isThere = true;
+                        break;
+                    }
+                }
+                break;
+            case "row":
+                for(int i = 0; i<N; i++) {
+                    if (cellsLists[row][i].contains(number) && i != col) {
+                        isThere = true;
+                        break;
+                    }
+                }
+                break;
+        }
+        return isThere;
+    }
+
+    public Sudoku partiallyFill(Sudoku sudoku, ArrayList<Integer> numList){
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                //See if the cell is empty
+                if(sudoku.getNumber(i,j) == 0) {
                     //If only one value is possible, assign this value to the cell and restart the outer
                     // loop.
+                    ArrayList<Integer> tempNumList = cellsLists[i][j];
                     if (tempNumList.size() == 1) {
-                        //System.out.println("Added number in cell: " + tempNumList.get(0));
                         sudoku.setNumber(i, j, tempNumList.get(0));
                         fixed[i][j] = tempNumList.get(0);
+                        updateCellsLists(sudoku, numList);
                         i = 0;
                         j = 0;
                     }
@@ -183,7 +257,6 @@ public class StochasticSearch {
                 }
             }
         }
-        System.out.println();
         return sudoku;
     }
 
