@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Run {
     public static void main(String[] args) throws IOException {
@@ -24,14 +23,14 @@ public class Run {
 
         while(again){
             // Pick the size of the puzzle nxn
-            System.out.println("Pick a size for your Sudoku puzzle (between 2 and 5).");
+            System.out.println("Pick a size for your Sudoku puzzle (between 2 and 6).");
             do {
                 n = sc.nextInt();
-                if (n >= 2 && n <= 5) {
+                if (n >= 2 && n <= 6) {
                     wrongNumber = false;
                 }
                 else {
-                    System.out.println("Please pick a number between 2 and 5.");
+                    System.out.println("Please pick a number between 2 and 6.");
                     wrongNumber = true;
                 }
             }
@@ -60,7 +59,7 @@ public class Run {
             solutionPath = "solutions/" + n + "x" + n + "/s" + puzzleNum + ".txt";
 
             System.out.println("Select a number:");
-            System.out.println("1 - verify that the board is correctly formed");
+            System.out.println("1 - verify that the puzzle board is correctly formed");
             System.out.println("2 - verify Backtracking Algorithm");
             System.out.println("3 - verify Stochastic Search Algorithm");
             System.out.println("4 - verify Dancing Links Algorithm");

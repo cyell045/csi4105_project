@@ -1,8 +1,5 @@
-/**
+/*
  * Created by celineyelle on 2017-03-09.
- *
- * Based off of the solution provided by Anish Ratnawat
- * which was based off of Algorithm X by Donald Knuth
  */
 
 public class SudokuCell {
