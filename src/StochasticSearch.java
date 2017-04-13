@@ -161,12 +161,10 @@ public class StochasticSearch {
         for(int i = 0; i<N; i++){
             for (int j = 0; j < N; j++) {
                 if(sudoku.getNumber(i,j) == 0){
-                    System.out.println(cellsLists[i][j]);
                     for(int number: cellsLists[i][j]){
-                        System.out.println(number);
                         if( !isThere("col", number, i, j, sudoku) ||
-                            !isThere("row", number, i, j, sudoku) ){
-                            //!isThere("box", number, i, j, sudoku)){
+                            !isThere("row", number, i, j, sudoku) ||
+                            !isThere("box", number, i, j, sudoku)){
                             sudoku.setNumber(i, j, number);
                             updateCellsLists(sudoku, numList);
                             sudoku = partiallyFill(sudoku, numList);
@@ -207,17 +205,13 @@ public class StochasticSearch {
             case "box":
                 int startRow = row - (row%n);
                 int startCol = col - (col%n);
-                for(int i = 0; i<n; i++){
-                    for(int j = 0; j< n; j++){
-                        if(cellsLists[i+ startRow][j + startCol].contains(number)
-                                && (i+startRow)!=row && (j+startCol)!=col){
+                for(int i = startRow; i<n+startRow && !isThere; i++){
+                    for(int j = startCol; j< n + startCol; j++){
+                        if(cellsLists[i][j].contains(number)
+                                &&(j!=col || i!=row)){
                             isThere = true;
                             break;
                         }
-
-                    }
-                    if(isThere){
-                        break;
                     }
                 }
                 break;
