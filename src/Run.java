@@ -23,14 +23,14 @@ public class Run {
 
         while(again){
             // Pick the size of the puzzle nxn
-            System.out.println("Pick a size for your Sudoku puzzle (between 2 and 5).");
+            System.out.println("Pick a size for your Sudoku puzzle (between 2 and 6).");
             do {
                 n = sc.nextInt();
-                if (n >= 2 && n <= 5) {
+                if (n >= 2 && n <= 6) {
                     wrongNumber = false;
                 }
                 else {
-                    System.out.println("Please pick a number between 2 and 5.");
+                    System.out.println("Please pick a number between 2 and 6.");
                     wrongNumber = true;
                 }
             }
