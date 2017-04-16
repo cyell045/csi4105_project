@@ -14,7 +14,6 @@ public class StochasticSearch {
 
     private int n;
     private int N;
-    private int numberOfCell;
     private Sudoku problem;
     private Sudoku best_solution;
     private double t_0;
@@ -30,14 +29,12 @@ public class StochasticSearch {
         this.problem = sudoku;
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
-        this.numberOfCell = sudoku.getNumberOfCell();
         this.t_0 = 100;
         this.alpha = 0.99;
         this.fixed = new int[N][N];
     }
 
     public Solution solve() {
-
 
         lStartTime = System.nanoTime();
 
@@ -59,10 +56,10 @@ public class StochasticSearch {
         System.out.println(current_cost);
         T = t_0;
 
-        boolean isSolved = false;
+        boolean solved = false;
         int numTemperatures = 0;
         int improvements = 0;
-        while(!isSolved){
+        while(!solved){
             Random rand_col = new Random();
             int col = rand_col.nextInt(N);
 
@@ -79,9 +76,8 @@ public class StochasticSearch {
                 }
 
                 int tempCost = current_cost;
-                boolean solved = flipNumbers(problem, row1, row2, col);
+                solved = flipNumbers(problem, row1, row2, col);
                 if (solved) {
-                    isSolved = solved;
                     break;
                 }
                 if(tempCost > current_cost){
@@ -109,7 +105,6 @@ public class StochasticSearch {
 
     public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
 
-
         int num1 = sudoku.getNumber(row1, col);
         int num2 = sudoku.getNumber(row2, col);
 
@@ -123,6 +118,10 @@ public class StochasticSearch {
         //System.out.println("Old Cost: " + current_cost);
         //System.out.println("New Cost: " + newCost);
 
+        if(Math.exp(delta/T) - rand >0){
+            problem = sudoku;
+            current_cost = newCost;
+        }
         if(newCost < best_cost){
             long lEndTime = System.nanoTime();;
             BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
@@ -130,13 +129,8 @@ public class StochasticSearch {
             best_cost = newCost;
             System.out.println("New best cost: " + best_cost);
             System.out.println(time);
+        }
 
-        }
-        if(Math.exp(delta/T) - rand >0){
-            problem = sudoku;
-            current_cost = newCost;
-            //System.out.println("Updated current sudoku problem");
-        }
         if(newCost == 0){
             best_solution = problem;
             return true;
@@ -154,7 +148,6 @@ public class StochasticSearch {
             numList.add(i+1);
         }
 
-        updateCellsLists(sudoku, numList);
         sudoku = partiallyFill(sudoku, numList);
         updateCellsLists(sudoku, numList);
 
@@ -166,10 +159,11 @@ public class StochasticSearch {
                             !isThere("row", number, i, j, sudoku) ||
                             !isThere("box", number, i, j, sudoku)){
                             sudoku.setNumber(i, j, number);
-                            updateCellsLists(sudoku, numList);
                             sudoku = partiallyFill(sudoku, numList);
                             updateCellsLists(sudoku, numList);
                             fixed[i][j] = number;
+                            i = 0;
+                            j = 0;
                             break;
                         }
                     }
@@ -199,7 +193,7 @@ public class StochasticSearch {
         }
     }
 
-    public boolean isThere(String type, int number, int row, int col, Sudoku sudoku){
+    private boolean isThere(String type, int number, int row, int col, Sudoku sudoku){
         boolean isThere = false;
         switch(type){
             case "box":
@@ -237,6 +231,7 @@ public class StochasticSearch {
 
     public Sudoku partiallyFill(Sudoku sudoku, ArrayList<Integer> numList){
 
+        updateCellsLists(sudoku, numList);
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 //See if the cell is empty
