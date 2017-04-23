@@ -14,7 +14,6 @@ public class StochasticSearch {
 
     private int n;
     private int N;
-    private int numberOfCell;
     private Sudoku problem;
     private Sudoku best_solution;
     private double t_0;
@@ -30,14 +29,12 @@ public class StochasticSearch {
         this.problem = sudoku;
         this.n = sudoku.getN();
         this.N = sudoku.getNSquared();
-        this.numberOfCell = sudoku.getNumberOfCell();
-        this.t_0 = 100;
+        //this.t_0 = 100;
         this.alpha = 0.99;
         this.fixed = new int[N][N];
     }
 
     public Solution solve() {
-
 
         lStartTime = System.nanoTime();
 
@@ -54,20 +51,25 @@ public class StochasticSearch {
         System.out.println("Not solved yet. Going to Simulated Annealing algorithm.");
 
         problem = fillIn(problem);
+
+        this.t_0 = obtainInitialTemp(problem);
+        System.out.println("Initial Temperature: " + t_0);
+
         current_cost = costFunction(problem);
         best_cost = current_cost;
+        best_solution = problem;
         System.out.println(current_cost);
         T = t_0;
 
-        boolean isSolved = false;
+        boolean solved = false;
         int numTemperatures = 0;
         int improvements = 0;
-        while(!isSolved){
+        int iterations = getNeighbourhoodMoves();
+        System.out.println("Num of iterations: " + iterations);
+        while(!solved){
             Random rand_col = new Random();
             int col = rand_col.nextInt(N);
-
-            int iterations = getUnfixedCells(col);
-            while(iterations>0) {
+            for(int i =0; i<iterations; i++) {
                 Random rand_row1 = new Random();
                 int row1 = rand_row1.nextInt(N);
 
@@ -79,15 +81,13 @@ public class StochasticSearch {
                 }
 
                 int tempCost = current_cost;
-                boolean solved = flipNumbers(problem, row1, row2, col);
+                solved = flipNumbers(problem, row1, row2, col);
                 if (solved) {
-                    isSolved = solved;
                     break;
                 }
                 if(tempCost > current_cost){
                     improvements+=1;
                 }
-                iterations--;
             }
             T = alpha * T;
             numTemperatures +=1;
@@ -109,7 +109,6 @@ public class StochasticSearch {
 
     public boolean flipNumbers(Sudoku sudoku, Integer row1, Integer row2, Integer col){
 
-
         int num1 = sudoku.getNumber(row1, col);
         int num2 = sudoku.getNumber(row2, col);
 
@@ -120,23 +119,20 @@ public class StochasticSearch {
         double delta = -(newCost - current_cost);
         double rand  = Math.random();
 
-        //System.out.println("Old Cost: " + current_cost);
-        //System.out.println("New Cost: " + newCost);
-
-        if(newCost < best_cost){
-            long lEndTime = System.nanoTime();;
-            BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
-            best_solution = sudoku;
-            best_cost = newCost;
-            System.out.println("New best cost: " + best_cost);
-            System.out.println(time);
-
-        }
         if(Math.exp(delta/T) - rand >0){
             problem = sudoku;
             current_cost = newCost;
-            //System.out.println("Updated current sudoku problem");
         }
+
+        if(current_cost < best_cost){
+            long lEndTime = System.nanoTime();;
+            BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
+            best_solution = sudoku;
+            best_cost = current_cost;
+            System.out.println("New best cost: " + best_cost);
+            System.out.println(time);
+        }
+
         if(newCost == 0){
             best_solution = problem;
             return true;
@@ -154,7 +150,6 @@ public class StochasticSearch {
             numList.add(i+1);
         }
 
-        updateCellsLists(sudoku, numList);
         sudoku = partiallyFill(sudoku, numList);
         updateCellsLists(sudoku, numList);
 
@@ -166,16 +161,19 @@ public class StochasticSearch {
                             !isThere("row", number, i, j, sudoku) ||
                             !isThere("box", number, i, j, sudoku)){
                             sudoku.setNumber(i, j, number);
-                            updateCellsLists(sudoku, numList);
                             sudoku = partiallyFill(sudoku, numList);
                             updateCellsLists(sudoku, numList);
                             fixed[i][j] = number;
+                            i = 0;
+                            j = 0;
                             break;
                         }
                     }
                 }
             }
         }
+
+        sudoku = partiallyFill(sudoku, numList);
         return sudoku;
     }
 
@@ -199,7 +197,7 @@ public class StochasticSearch {
         }
     }
 
-    public boolean isThere(String type, int number, int row, int col, Sudoku sudoku){
+    private boolean isThere(String type, int number, int row, int col, Sudoku sudoku){
         boolean isThere = false;
         switch(type){
             case "box":
@@ -237,6 +235,7 @@ public class StochasticSearch {
 
     public Sudoku partiallyFill(Sudoku sudoku, ArrayList<Integer> numList){
 
+        updateCellsLists(sudoku, numList);
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 //See if the cell is empty
@@ -260,14 +259,16 @@ public class StochasticSearch {
         return sudoku;
     }
 
-    public int getUnfixedCells(int col){
+    public int getNeighbourhoodMoves(){
         int blank_cells=0;
-        for (int i = 0; i < N; i++) {
-            if(fixed[i][col]==0){
-                blank_cells+=1;
+        for(int j = 0; j<N; j++){
+            for (int i = 0; i < N; i++) {
+                if(fixed[i][j]==0){
+                   blank_cells+=1;
+                }
             }
         }
-        return blank_cells;
+        return blank_cells*blank_cells;
     }
 
 
@@ -311,5 +312,49 @@ public class StochasticSearch {
             }
         }
         return cost;
+    }
+
+    public double obtainInitialTemp(Sudoku sudoku){
+        int[] costs = new int[100];
+
+        int i = 0;
+        int sum = 0;
+        while(i<100){
+            Random rand_col = new Random();
+            int col = rand_col.nextInt(N);
+
+            Random rand_row1 = new Random();
+            int row1 = rand_row1.nextInt(N);
+
+            Random rand_row2 = new Random();
+            int row2 = rand_row2.nextInt(N);
+
+            if (fixed[row1][col] != 0 || fixed[row2][col] != 0) {
+                continue;
+            }
+
+            int num1 = sudoku.getNumber(row1, col);
+            int num2 = sudoku.getNumber(row2, col);
+
+            sudoku.setNumber(row1, col, num2);
+            sudoku.setNumber(row2, col, num1);
+
+            costs[i] = costFunction(sudoku);
+            sum += costs[i];
+            i++;
+        }
+
+        double avg = sum/costs.length;
+        double avg_squared = avg*avg;
+        sum = 0;
+
+        for(i = 0; i< costs.length; i++){
+            int sq = costs[i]*costs[i];
+            sum += sq;
+        }
+
+        double avg_of_squares = sum/costs.length;
+
+        return avg_of_squares - avg_squared;
     }
 }
