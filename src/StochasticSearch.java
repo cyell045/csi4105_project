@@ -39,7 +39,7 @@ public class StochasticSearch {
         lStartTime = System.nanoTime();
 
         problem = getOptimizedBoard(problem);
-        problem.printBoard(1);
+        //problem.printBoard(1);
 
         if(problem.isBoardSolved()){
             System.out.println("Miraculously solved the board. No need to go to the Simulated Annealing algorithm.");
@@ -53,7 +53,6 @@ public class StochasticSearch {
         problem = fillIn(problem);
 
         this.t_0 = obtainInitialTemp(problem);
-        System.out.println("Initial Temperature: " + t_0);
 
         current_cost = costFunction(problem);
         best_cost = current_cost;
@@ -65,7 +64,6 @@ public class StochasticSearch {
         int numTemperatures = 0;
         int improvements = 0;
         int iterations = getNeighbourhoodMoves();
-        System.out.println("Num of iterations: " + iterations);
         while(!solved){
             Random rand_col = new Random();
             int col = rand_col.nextInt(N);
@@ -124,11 +122,11 @@ public class StochasticSearch {
             current_cost = newCost;
         }
 
-        if(current_cost < best_cost){
+        if(newCost < best_cost){
             long lEndTime = System.nanoTime();;
             BigDecimal time = BigDecimal.valueOf(lEndTime - lStartTime).divide(BigDecimal.valueOf(1000000));
             best_solution = sudoku;
-            best_cost = current_cost;
+            best_cost = newCost;
             System.out.println("New best cost: " + best_cost);
             System.out.println(time);
         }
@@ -341,6 +339,9 @@ public class StochasticSearch {
 
             costs[i] = costFunction(sudoku);
             sum += costs[i];
+            sudoku.setNumber(row1, col, num1);
+            sudoku.setNumber(row2, col, num2);
+
             i++;
         }
 
@@ -351,6 +352,12 @@ public class StochasticSearch {
         for(i = 0; i< costs.length; i++){
             int sq = costs[i]*costs[i];
             sum += sq;
+        }
+
+        int cost1 = costFunction(sudoku);
+        int cost2 = costFunction(problem);
+        if(cost1<cost2){
+            problem = sudoku;
         }
 
         double avg_of_squares = sum/costs.length;
